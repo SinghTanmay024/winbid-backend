@@ -20,8 +20,8 @@ public class UserController {
 
     // Create - Register a new user
     @PostMapping("/register")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        User savedUser = userService.registerUser(user);
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        User savedUser = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
     // Read - Get user by email

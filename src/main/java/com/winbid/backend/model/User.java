@@ -39,13 +39,11 @@ public class User {
 
     private String role;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference // Prevent infinite recursion
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference  // Prevents infinite recursion
     private List<Bid> bids;
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
-
-    // Getters and Setters
 }
 

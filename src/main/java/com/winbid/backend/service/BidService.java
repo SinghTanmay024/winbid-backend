@@ -30,24 +30,38 @@ public class BidService {
 
     // ✅ Place a bid (Create)
     public Bid placeBid(BidRequest bidRequest) {
-        User user = userRepository.findById(bidRequest.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Product product = productRepository.findById(bidRequest.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+            User user = userRepository.findById(bidRequest.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            Product product = productRepository.findById(bidRequest.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Bid bid = new Bid();
-        bid.setUser(user);
-        bid.setProduct(product);
-        bid.setBidAmount(bidRequest.getBidAmount());
+            // Check if bidding is already completed for this product
+            long currentBidCount = bidRepository.countByProduct(product);
+            if (currentBidCount >= product.getTotalBids()) {
+                throw new RuntimeException("Bidding has been completed for this product.");
+            }
 
-        Bid savedBid = bidRepository.save(bid);
+            // Check if the user has already placed a bid for this product
+            boolean hasAlreadyBid = bidRepository.existsByUserAndProduct(user, product);
+            if (hasAlreadyBid) {
+                throw new RuntimeException("User has already placed a bid for this product.");
+            }
 
-        List<Bid> bids = bidRepository.findByProductId(product.getId());
-        if(bids.size() == product.getTotalBids()){
-            assignWinner(product,bids);
-        }
-        return savedBid;
+            // Save the new bid
+            Bid bid = new Bid();
+            bid.setUser(user);
+            bid.setProduct(product);
+            bid.setBidAmount(bidRequest.getBidAmount());
+            Bid savedBid = bidRepository.save(bid);
+
+            // After saving, check if the total bids have reached the limit
+            if (currentBidCount + 1 == product.getTotalBids()) {
+                List<Bid> bids = bidRepository.findByProductId(product.getId());
+                assignWinner(product, bids);
+            }
+            return savedBid;
     }
+
 
 
     private void assignWinner(Product product,List<Bid> bids) {
