@@ -1,6 +1,8 @@
 package com.winbid.backend.controller;
 
 import com.winbid.backend.model.Bid;
+import com.winbid.backend.model.BidRequest;
+import com.winbid.backend.model.BidResponse;
 import com.winbid.backend.service.BidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +20,9 @@ public class BidController {
 
     // ✅ Create a new bid (Place a bid)
     @PostMapping
-    public ResponseEntity<Bid> placeBid(@RequestBody Bid bid) {
-        Bid savedBid = bidService.placeBid(bid);
-        return ResponseEntity.ok(savedBid);
+    public ResponseEntity<BidResponse> placeBid(@RequestBody BidRequest bidRequest) {
+        Bid savedBid = bidService.placeBid(bidRequest);
+        return ResponseEntity.ok(new BidResponse(savedBid));
     }
 
     // ✅ Get all bids

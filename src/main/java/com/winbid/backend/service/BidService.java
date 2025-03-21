@@ -1,11 +1,9 @@
 package com.winbid.backend.service;
 
-import com.winbid.backend.model.Bid;
-import com.winbid.backend.model.Product;
-import com.winbid.backend.model.User;
-import com.winbid.backend.model.Winner;
+import com.winbid.backend.model.*;
 import com.winbid.backend.repositories.BidRepository;
 import com.winbid.backend.repositories.ProductRepository;
+import com.winbid.backend.repositories.UserRepository;
 import com.winbid.backend.repositories.WinnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,40 +25,32 @@ public class BidService {
     @Autowired
     private ProductRepository productRepository;
 
-    // ✅ Place a bid (Create)
-    public Bid placeBid(Bid bid) {
-        System.out.println("Inside the function");
+    @Autowired
+    private UserRepository userRepository;
 
-        // Load the product from the database using its ID
-        Product product = productRepository.findById(bid.getProduct().getId())
+    // ✅ Place a bid (Create)
+    public Bid placeBid(BidRequest bidRequest) {
+        User user = userRepository.findById(bidRequest.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Product product = productRepository.findById(bidRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        System.out.println(product);
+        Bid bid = new Bid();
+        bid.setUser(user);
+        bid.setProduct(product);
+        bid.setBidAmount(bidRequest.getBidAmount());
 
-        // Increment total bids for the product
-        product.setTotalBids(product.getTotalBids() + 1);
+        Bid savedBid = bidRepository.save(bid);
 
-        // Save the bid
-        bidRepository.save(bid);
-
-        // Check if the total number of bids for the product matches totalBids
-        Long bidCount = bidRepository.countByProductId(product.getId());
-        if (bidCount.equals(Long.valueOf(product.getTotalBids()))) {
-            assignWinner(product);
+        List<Bid> bids = bidRepository.findByProductId(product.getId());
+        if(bids.size() == product.getTotalBids()){
+            assignWinner(product,bids);
         }
-
-        return bid;
+        return savedBid;
     }
 
-    private void assignWinner(Product product) {
-        // Get all the bids for the product
-        List<Bid> bids = bidRepository.findByProductId(product.getId());
 
-        // If there are no bids, do nothing
-        if (bids.isEmpty()) {
-            return;
-        }
-
+    private void assignWinner(Product product,List<Bid> bids) {
         // Randomly pick a winner
         int randomIndex = new Random().nextInt(bids.size());
         Bid winningBid = bids.get(randomIndex);

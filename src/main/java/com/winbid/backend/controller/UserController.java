@@ -20,11 +20,10 @@ public class UserController {
 
     // Create - Register a new user
     @PostMapping("/register")
-    public ResponseEntity<User> addUser(@RequestBody @Valid User user) {
+    public ResponseEntity<User> addUser(@RequestBody User user) {
         User savedUser = userService.registerUser(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
-
     // Read - Get user by email
     @GetMapping("/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {

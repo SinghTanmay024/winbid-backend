@@ -15,14 +15,12 @@ public class Bid {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "product_id")
-    @JsonIgnore // Ignore lazy-loaded association during serialization
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
-    @JsonIgnore // Ignore lazy-loaded association during serialization
     private User user;
 
     @Positive(message = "Bid amount must be positive")

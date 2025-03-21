@@ -78,6 +78,10 @@
 			<version>1.18.24</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
 
 		<!-- Spring Boot DevTools for hot reloading during development (optional) -->
 		<dependency>
