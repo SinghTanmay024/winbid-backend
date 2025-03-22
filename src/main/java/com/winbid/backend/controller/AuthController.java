@@ -1,5 +1,6 @@
 package com.winbid.backend.controller;
 
+import com.winbid.backend.model.JwtResponse;
 import com.winbid.backend.model.LoginRequest;
 import com.winbid.backend.model.User;
 import com.winbid.backend.repositories.UserRepository;
@@ -36,61 +37,69 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;  // Inject PasswordEncoder
+    private PasswordEncoder passwordEncoder;
 
     // User registration endpoint
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
-//        // Check if the user already exists
-//        if (userRepository.existsByEmail(user.getEmail())) {
-//            return ResponseEntity.badRequest().body("Email already in use");
-//        }
-//
-//        // Encode the password before saving it to the database
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//
-//        // Save the user to the database
-//        userRepository.save(user);
-//
-//        return ResponseEntity.ok("User registered successfully");
-        try{
-            authenticationManager.authenticate
-                    (new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        // Check if the user already exists
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already in use");
+        }
 
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
-            String jwt = jwtUtil.generateToken(userDetails.getUsername());
-            return new  ResponseEntity<>(jwt,HttpStatus.OK);
-        }catch (Exception e){
-            log.error("Exception occured while creating token");
-            return new  ResponseEntity<>("Incorrect username or password",HttpStatus.BAD_REQUEST);
+        try {
+            // Encode the password before saving it
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            // Save the user to the database
+            userRepository.save(user);
+
+            return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);  // Return 201 status for successful creation
+        } catch (Exception e) {
+            log.error("Exception occurred during user registration", e);
+            return new ResponseEntity<>("Error occurred during registration", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Login endpoint
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
 
         // Check if the user exists in the database
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        // Compare entered password with stored password (encoded)
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity.badRequest().body("Bad credentials");
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
 
-        // Authenticate using AuthenticationManager if password matches
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
+        // Authenticate using AuthenticationManager
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
 
-        // Set authentication context
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Set authentication context
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Generate JWT token
-        String jwt = jwtUtil.generateToken(email);
-        return ResponseEntity.ok(jwt);
+            // Generate JWT token
+            String jwt = jwtUtil.generateToken(email);
+
+            // Return JWT token in the response
+            return ResponseEntity.ok(new JwtResponse(jwt));
+        } catch (Exception e) {
+            // Log the error and provide a generic message
+            log.error("Authentication failed for email: {}", email, e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        }
+    }
+
+
+    // Logout endpoint
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout() {
+        // Clear authentication context (invalidate session)
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok("Logged out successfully");
     }
 }
-

@@ -1,6 +1,8 @@
 package com.winbid.backend.controller;
 
+import com.winbid.backend.model.Bid;
 import com.winbid.backend.model.User;
+import com.winbid.backend.repositories.BidRepository;
 import com.winbid.backend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BidRepository bidRepository;
 
     // Create - Register a new user
     @PostMapping("/register")
@@ -63,5 +68,15 @@ public class UserController {
     public ResponseEntity<Void> deleteAllUsers() {
         userService.deleteAllUsers();
         return ResponseEntity.noContent().build(); // HTTP 204 NO CONTENT
+    }
+    @GetMapping("/bids/{userId}")
+    public ResponseEntity<Integer> numberOfBids(@PathVariable Long userId) {
+        List<Bid> bids = bidRepository.findByUserId(userId);
+        return ResponseEntity.ok(bids.size());
+    }
+    @GetMapping("/bidproduct/{userId}")
+    public ResponseEntity<List<Bid>> BidProduct(@PathVariable Long userId) {
+        List<Bid> bids = bidRepository.findByUserId(userId);
+        return ResponseEntity.ok(bids);
     }
 }

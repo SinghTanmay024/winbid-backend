@@ -16,4 +16,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     boolean existsByUserAndProduct(User user, Product product);
 
     long countByProduct(Product product);
+
+    List<Bid> findByUserId(Long userid);
 }
