@@ -2,6 +2,7 @@ package com.winbid.backend.controller;
 
 import com.winbid.backend.model.Product;
 import com.winbid.backend.model.ProductRequest;
+import com.winbid.backend.model.Role;
 import com.winbid.backend.model.User;
 import com.winbid.backend.service.ProductService;
 import com.winbid.backend.service.UserService;
@@ -44,8 +45,14 @@ public class ProductController {
     // Create a new product
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody ProductRequest productRequest) {
-        // Fetch admin (user) by ID from the adminRequest
+        // Fetch user by ID
         User admin = userService.getUserById(productRequest.getAdmin().getId());
+
+        // ✅ Check if the user is an admin
+        if (admin.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(null); // Or throw an exception
+        }
 
         // Map ProductRequest to Product entity
         Product product = new Product();
@@ -56,7 +63,7 @@ public class ProductController {
         product.setBidPrice(productRequest.getBidPrice());
         product.setOwner(admin);  // Set the admin (owner) to the product
 
-        // Save the product via the service
+        // Save the product
         Product savedProduct = productService.createProduct(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);

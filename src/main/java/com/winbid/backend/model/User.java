@@ -37,7 +37,8 @@ public class User {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    private String role;
+    @Enumerated(EnumType.STRING) // Use Enum for roles
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference  // Prevents infinite recursion
