@@ -8,9 +8,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -78,5 +83,26 @@ public class UserController {
     public ResponseEntity<List<Bid>> BidProduct(@PathVariable Long userId) {
         List<Bid> bids = bidRepository.findByUserId(userId);
         return ResponseEntity.ok(bids);
+    }
+    @GetMapping("/profile")
+    public ResponseEntity<Map<String, Object>> getUserProfile(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        System.out.println("Authenticating user: " + userDetails.getUsername());
+
+        String email = userDetails.getUsername();
+        User user = userService.getUserByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found for email: " + email));
+
+        System.out.println("Found user: " + user.getEmail());
+
+        List<Bid> bids = bidRepository.findByUserId(user.getId());
+        System.out.println("User has " + bids.size() + " bids");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", user);
+        response.put("bids", bids);
+
+        return ResponseEntity.ok(response);
     }
 }

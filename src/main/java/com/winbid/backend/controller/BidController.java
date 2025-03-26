@@ -1,14 +1,17 @@
 package com.winbid.backend.controller;
 
+import com.winbid.backend.model.User;
 import com.winbid.backend.model.Bid;
 import com.winbid.backend.model.BidRequest;
 import com.winbid.backend.model.BidResponse;
+import com.winbid.backend.repositories.BidRepository;
 import com.winbid.backend.service.BidService;
+import com.winbid.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 import java.util.Optional;
 
 @RestController
@@ -17,6 +20,12 @@ public class BidController {
 
     @Autowired
     private BidService bidService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private BidRepository bidRepository;
 
     // ✅ Create a new bid (Place a bid)
     @PostMapping

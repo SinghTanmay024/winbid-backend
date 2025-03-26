@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WinnerRepository extends JpaRepository<Winner, Long> {
+    Winner findByProductId(Long productId);
 }

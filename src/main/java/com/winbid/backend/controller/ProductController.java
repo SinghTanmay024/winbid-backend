@@ -1,9 +1,8 @@
 package com.winbid.backend.controller;
 
-import com.winbid.backend.model.Product;
-import com.winbid.backend.model.ProductRequest;
-import com.winbid.backend.model.Role;
-import com.winbid.backend.model.User;
+import com.winbid.backend.model.*;
+import com.winbid.backend.repositories.BidRepository;
+import com.winbid.backend.repositories.WinnerRepository;
 import com.winbid.backend.service.ProductService;
 import com.winbid.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,12 @@ public class ProductController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BidRepository bidRepository;
+
+    @Autowired
+    private WinnerRepository winnerRepository;
 
     // Get all products
     @GetMapping
@@ -88,5 +93,20 @@ public class ProductController {
         boolean deleted = productService.deleteProduct(id);
         return deleted ? ResponseEntity.noContent().build() // HTTP 204 NO CONTENT
                 : ResponseEntity.notFound().build(); // HTTP 404 NOT FOUND
+    }
+    @GetMapping("/bid/{id}")
+    public ResponseEntity<Integer> completedBids(@PathVariable Long id){
+        List<Bid> bids = bidRepository.findByProductId(id);
+        return new ResponseEntity<>(bids.size(),HttpStatus.OK);
+    }
+
+    @GetMapping("/winner/{id}")
+    public ResponseEntity<Long> productWinner(@PathVariable Long id){
+        Long userId = 0L;
+        Winner winner = winnerRepository.findByProductId(id);
+        if(winner != null){
+            userId = winner.getUser().getId();;
+        }
+        return new ResponseEntity<>(userId,HttpStatus.OK);
     }
 }

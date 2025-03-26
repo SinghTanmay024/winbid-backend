@@ -1,18 +1,17 @@
 package com.winbid.backend.model;
 
+import lombok.Data;
+import lombok.Getter;
+
+@Getter
+@Data
 public class JwtResponse {
-    private String token;
+    private String jwt;
 
-    public JwtResponse(String token) {
-        this.token = token;
+    public JwtResponse(String jwt) {
+        this.jwt = jwt;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
+    // Add other fields if needed (user details, etc.)
 }
 

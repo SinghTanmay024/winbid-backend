@@ -14,8 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -102,4 +100,22 @@ public class AuthController {
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok("Logged out successfully");
     }
+    @GetMapping("/validate")
+    public ResponseEntity<String> validate(Authentication authentication) {
+        try {
+            // Check if the user is authenticated
+            if (authentication != null && authentication.isAuthenticated()) {
+                // User is authenticated
+                String username = authentication.getName();
+                return ResponseEntity.ok("Token is valid for user: " + username);
+            } else {
+                // No valid authentication found
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+            }
+        } catch (Exception e) {
+            log.error("Error during token validation", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during validation");
+        }
+    }
+
 }
