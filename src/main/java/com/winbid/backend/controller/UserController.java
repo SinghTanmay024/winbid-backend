@@ -2,6 +2,7 @@ package com.winbid.backend.controller;
 
 import com.winbid.backend.model.Bid;
 import com.winbid.backend.model.User;
+import com.winbid.backend.model.UserRegistrationDto;
 import com.winbid.backend.repositories.BidRepository;
 import com.winbid.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -28,7 +29,6 @@ public class UserController {
     @Autowired
     private BidRepository bidRepository;
 
-    // Create - Register a new user
     @PostMapping("/register")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User savedUser = userService.saveUser(user);
@@ -104,5 +104,10 @@ public class UserController {
         response.put("bids", bids);
 
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/role/{userId}")
+    public ResponseEntity<String> getRole(@PathVariable Long userId){
+        User user = userService.getUserById(userId);
+        return new ResponseEntity<>("ADMIN",HttpStatus.OK);
     }
 }

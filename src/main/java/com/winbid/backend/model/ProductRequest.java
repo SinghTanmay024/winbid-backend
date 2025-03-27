@@ -4,6 +4,7 @@ package com.winbid.backend.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 @Data
@@ -16,7 +17,7 @@ public class ProductRequest {
 
     private String imageUrl;
 
-    @Positive(message = "Total bids must be positive")
+    @PositiveOrZero(message = "Total bids must be zero or positive")
     private Integer totalBids = 0;
 
     @Positive(message = "Bid price must be positive")
