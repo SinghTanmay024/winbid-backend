@@ -8,6 +8,7 @@ import com.winbid.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,13 +52,13 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody ProductRequest productRequest) {
         // Fetch user by ID
-        User admin = userService.getUserById(productRequest.getAdmin().getId());
+        User admin = userService.getUserById(productRequest.getUserId());
 
         // ✅ Check if the user is an admin
-        if (admin.getRole() != Role.ADMIN) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(null); // Or throw an exception
-        }
+//        if (admin.getRole() != Role.ADMIN) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body(null); // Or throw an exception
+//        }
 
         // Map ProductRequest to Product entity
         Product product = new Product();

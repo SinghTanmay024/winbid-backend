@@ -21,12 +21,6 @@ public class BidController {
     @Autowired
     private BidService bidService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private BidRepository bidRepository;
-
     // ✅ Create a new bid (Place a bid)
     @PostMapping
     public ResponseEntity<BidResponse> placeBid(@RequestBody BidRequest bidRequest) {

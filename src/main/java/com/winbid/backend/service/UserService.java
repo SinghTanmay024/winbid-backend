@@ -11,11 +11,32 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired  // Make sure you're using constructor injection
+    public UserService(UserRepository userRepository, EmailService emailService) {
+        this.userRepository = userRepository;
+        this.emailService = emailService;
+    }
 
     // Create user
     public User saveUser(User user) {
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Send thank you email
+        try {
+            System.out.println("Before sending email");  // Simple debug
+            emailService.sendThankYouEmail(savedUser.getEmail(), savedUser.getFirstName());
+            System.out.println("After sending email");  // Simple debug
+        } catch (Exception e) {
+            // Log the error but don't fail the registration
+            System.err.println("Failed to send thank you email: " + e.getMessage());
+        }
+
+        return savedUser;
     }
 
     // Get user by email

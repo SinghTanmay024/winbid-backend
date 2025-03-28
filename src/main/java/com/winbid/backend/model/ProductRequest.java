@@ -24,12 +24,6 @@ public class ProductRequest {
     private Double bidPrice;
 
     @NotNull(message = "Admin information is required")
-    private AdminRequest admin;
-
-    @Data
-    public static class AdminRequest {
-        @NotNull(message = "Admin ID is required")
-        private Long id; // Use Long for the admin ID
-    }
+    private Long userId;
 }
 
