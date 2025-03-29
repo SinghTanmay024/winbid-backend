@@ -28,7 +28,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**","/api/products/**","/api/users/**","/api/bids/**").permitAll()  // Allow access to auth routes
+                        .requestMatchers("/api/auth/**").permitAll()  // Allow access to auth routes
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailsService),
