@@ -1,11 +1,11 @@
 package com.winbid.backend.model;
 
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
+import jdk.jfr.ContentType;
 import lombok.Data;
+
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class ProductRequest {
@@ -15,7 +15,9 @@ public class ProductRequest {
 
     private String description;
 
-    private String imageUrl;
+    // Change from String to MultipartFile
+    private MultipartFile imageFile;
+
 
     @PositiveOrZero(message = "Total bids must be zero or positive")
     private Integer totalBids = 0;

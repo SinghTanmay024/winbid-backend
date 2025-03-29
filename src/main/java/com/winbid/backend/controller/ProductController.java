@@ -2,16 +2,25 @@ package com.winbid.backend.controller;
 
 import com.winbid.backend.model.*;
 import com.winbid.backend.repositories.BidRepository;
+import com.winbid.backend.repositories.ProductRepository;
+import com.winbid.backend.repositories.UserRepository;
 import com.winbid.backend.repositories.WinnerRepository;
+import com.winbid.backend.service.CloudinaryService;
 import com.winbid.backend.service.ProductService;
 import com.winbid.backend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -29,6 +38,15 @@ public class ProductController {
 
     @Autowired
     private WinnerRepository winnerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     // Get all products
     @GetMapping
@@ -49,30 +67,39 @@ public class ProductController {
     }
 
     // Create a new product
-    @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductRequest productRequest) {
-        // Fetch user by ID
-        User admin = userService.getUserById(productRequest.getUserId());
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createProduct(
+            @Valid @ModelAttribute ProductRequest productRequest,
+            BindingResult bindingResult) throws IOException {
 
-        // ✅ Check if the user is an admin
-//        if (admin.getRole() != Role.ADMIN) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body(null); // Or throw an exception
-//        }
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
 
-        // Map ProductRequest to Product entity
+        // Find the owner
+        User owner = userRepository.findById(productRequest.getUserId())
+                .orElseThrow(() -> new IOException("User not found"));
+
+        // Upload image to Cloudinary if present
+        String imageUrl = null;
+        if (productRequest.getImageFile() != null && !productRequest.getImageFile().isEmpty()) {
+            imageUrl = cloudinaryService.uploadFile(productRequest.getImageFile());
+        }
+
+        // Create product
         Product product = new Product();
         product.setName(productRequest.getName());
         product.setDescription(productRequest.getDescription());
-        product.setImageUrl(productRequest.getImageUrl());
+        product.setImageUrl(imageUrl);
         product.setTotalBids(productRequest.getTotalBids());
         product.setBidPrice(productRequest.getBidPrice());
-        product.setOwner(admin);  // Set the admin (owner) to the product
+        product.setOwner(owner);
 
-        // Save the product
-        Product savedProduct = productService.createProduct(product);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+        Product savedProduct = productRepository.save(product);
+        return ResponseEntity.ok(savedProduct);
     }
 
     // Update product

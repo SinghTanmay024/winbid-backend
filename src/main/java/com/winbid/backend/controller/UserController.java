@@ -88,16 +88,14 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> getUserProfile(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        System.out.println("Authenticating user: " + userDetails.getUsername());
-
         String email = userDetails.getUsername();
         User user = userService.getUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found for email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        System.out.println("Found user: " + user.getEmail());
+        // Clear sensitive data
+        user.setPassword(null);
 
         List<Bid> bids = bidRepository.findByUserId(user.getId());
-        System.out.println("User has " + bids.size() + " bids");
 
         Map<String, Object> response = new HashMap<>();
         response.put("user", user);
