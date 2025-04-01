@@ -1,72 +1,62 @@
-# WinBid - Online Bidding Platform
+# WinBid - Online Bidding Platform (Backend)
 
-WinBid is a modern web application where users can participate in product auctions by placing small bids. Admins can manage products, and winners are automatically selected when bidding completes.
+WinBid is a modern auction platform backend built with Spring Boot where users can participate in product auctions by placing small bids. Admins can manage products, and winners are automatically selected when bidding completes.
 
-## Features
+## 🚀 Features
+
+### 🔒 Authentication & Security
+- JWT-based authentication (using jjwt)
+- Spring Security integration
+- Role-based access control (Admin/User)
+- Password encryption
 
 ### 🛠️ Core Functionality
-- **User Authentication & Authorization**
-  - Secure JWT-based login/logout
-  - Role-based access control (Admin vs Regular User)
-  - Protected routes for authenticated users
+- RESTful API endpoints
+- Data validation with Spring Validation
+- Exception handling
+- Actuator endpoints for monitoring
 
-### 👨‍💻 Admin Features
-- **Product Management**
-  - Add new products with details (name, description, images, etc.)
-  - Edit existing product information
-  - Delete products
-  - Set total required bids for each product
-- **Dashboard** with bidding analytics
+### 📦 Product Management (Admin)
+- CRUD operations for products
+- Image upload to Cloudinary
+- Set total required bids per product
+- Product status tracking
 
-### 👤 User Features
-- **Product Bidding**
-  - Browse available products
-  - Place bids on products
-  - View bidding history
-- **Winner Announcement**
-  - Automatic winner selection when bid threshold is reached
-  - Notification system for winners
-  - Winner history log
+### 💰 Bidding System
+- Place bids API
+- Bid validation
+- Automatic winner selection
+- Email notifications (Spring Mail)
 
-### 🎨 UI/UX
-- Responsive design with Material-UI and Tailwind CSS
-- Smooth animations with Framer Motion
-- Intuitive navigation with React Router
+### 📊 Database
+- MySQL relational database
+- Spring Data JPA repositories
+- Entity relationships
+- Auditing fields
 
-## Technologies Used
+## 🛠️ Technologies Used
 
-### Frontend
-- React 19 (with Vite)
-- Material-UI (MUI) v6 + Emotion
-- Tailwind CSS
-- React Router v7
-- Axios for API calls
-- Framer Motion for animations
-- Lucide React + React Icons
-
-### Build Tools
-- Vite
-- ESLint
-- PostCSS + Autoprefixer
+### Backend Stack
+- **Spring Boot** 3.x
+- **Spring Security** (Authentication/Authorization)
+- **Spring Data JPA** (Database access)
+- **MySQL** (Database)
+- **JJWT** (JSON Web Tokens)
+- **Cloudinary** (Image storage)
+- **Spring Mail** (Email notifications)
+- **Lombok** (Boilerplate reduction)
+- **Spring Boot Actuator** (Monitoring)
 
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18+ recommended)
-- npm (v9+ recommended)
+- Java 17+
+- MySQL 8+
+- Maven 3.6+
 
 ### Installation
 1. Clone the repository:
    ```bash
    git clone https://github.com/SinghTanmay024/winbid-backend.git
    cd winbid-backend
-
-You can simply:
-1. Copy all this text
-2. Create a new `README.md` file in your project root
-3. Paste this content
-4. Make any necessary adjustments (like replacing `yourusername` with your actual GitHub username)
-
-The file is properly formatted with Markdown and includes all the sections we discussed about your bidding system functionality.
-
